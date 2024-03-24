@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if test $# -eq 0
+then
+	echo "error falten parametres"
+	exit
+else
+	while [ "$1" ]
+	do
+		head -n `grep $1 /etc/passwd | wc -l` | tail -n 1 | cut -f 5 -d ':'
+		shift
+	done
+fi
+# intent 1:  grep `cut -f 1 -d ':' /etc/passwd | grep "u20"` /etc/passwd

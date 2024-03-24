@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ $# -eq 0 ]; then
+	echo "Falten Parametres" 1>&2
+else
+	kill -9 `ps -o "%p:%c" | grep $1 | cut -f 1 -d ':'`
+	echo "Has matat a $1"
+fi

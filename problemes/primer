@@ -1,0 +1,6 @@
+#!/bin/bash
+
+MISSATGE="Hola Mon"
+echo $MISSATGE
+sleep 5
+ls -lisa

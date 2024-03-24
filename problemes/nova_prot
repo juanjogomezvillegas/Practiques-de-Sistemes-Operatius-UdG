@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#set -x
+
+if [ $# -gt 0 ]; then
+	if [ `(ls $1 | wc -l) 2> /dev/null` -gt 0 ]; then
+		if [ $# -ge 2 ]; then
+			if [ `echo $2 | grep '^[0-7]\{3\}$' | wc -m` -gt 0 ]; then
+				chmod $2 $1
+			else
+				echo "La proteccio introduida no es correcte. Ajuda: 0-7 (usuari); 0-7 (grup); 0-7 (altres)" 1>&2
+			fi
+		fi
+	else
+		echo "$1 no existeix" 1>&2
+	fi
+else
+	echo "Falten parametres. Ajuda: $0 nom [ proteccio ]" 1>&2
+fi
+
+

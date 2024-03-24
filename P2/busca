@@ -1,0 +1,159 @@
+#!/bin/bash
+# Programa realitzat per Juan Jose Gomez Villegas
+
+#set -x
+
+# Creacio de variables globals
+filtre=0 # Indica si s'ha entrat algun parametre per filtrar fitxers, per defecte 0 (no s'aplica cap filtre)
+nomFitxer="" # opcio -n
+numInode="" # opcio -i
+permisos="" # opcio -p
+ordre="alfa" # opcio -o, opcions disponibles (alfa, mida), per defecte alfa
+directori=`pwd` # opcio -d, per defecte el directori actual
+sortida="" # opcio -s, per defecte 1 (canal de sortida estandard de unix)
+sortidaError="/dev/null" # sortida d'error
+numFitxers=0 # Total de fitxers trobats
+
+while [ "$1" ] # Primera part, llegeix els parametres entrats
+do
+	case $1 in
+		-n) filtre=1
+			nomFitxer="$2"
+			;;
+		-i) filtre=1
+			numInode="$2"
+			;;
+		-p) filtre=1
+			permisos="$2"
+			;;
+		-o) ordre="$2"
+			;;
+		-d) directori="$2"
+			;;
+		-s) sortida="`pwd`/$2"
+			;;
+	esac
+	shift 2
+done
+
+# Abans de continuar, obre un subshell per accedir al directori i aixi poder obtenir la ruta absoluta, 
+# i es comprova tambe si es pot accedir al directori base
+aux=$directori
+directori=`( cd $directori 2> $sortidaError && pwd || echo "2" )`
+
+if [[ $directori = "2" ]]; then # Si no s'ha pogut accedir al directori base, mostra un missatge d'error
+	printf "\033[0;41m El directori $aux no pot ser el directori base: No tens permisos per accedir. \033[0m \n" 1>&2
+	exit 1
+fi
+
+# Segona part, declaracio de funcions
+
+# Imprimeix un missatge entrat per parametre
+# Pre: $1 no es buit, $2 es opcional
+# Post: $1 imprimit al fitxer de sortida o a la consola
+function imprimir() {
+	if [[ $sortida != "" ]]; then
+		echo $1 1>> $sortida
+	else
+		echo $1
+	fi
+}
+
+# Llista el contingut del directori actual
+# Pre: Ser al directori actual (.)
+# Post: llistat del contingut del directori actual, ordenat per mida o alfanumeric
+# Nota: Per defecte ls llista el contingut d'un directori ordenat per alfanumeric
+function llistar() {
+	if [[ $ordre = "mida" ]]; then # Si l'ordre entrat es "mida", es llista contingut del directori ordenat per mida
+		llista=`ls -a --sort=size 2> $sortidaError`
+	else # Si no, es llista el contingut del directori ordenat de forma alfanumerica pel nom
+		llista=`ls -a 2> $sortidaError`
+	fi
+
+	echo $llista # retorna una llista ordenada amb el contingut del directori
+}
+
+# Busca fitxers
+# Pre: $1 no es buit
+# Post: llistat recursiu de fitxers continguts a $1
+function buscar() {
+	# Creacio de variables locals
+	local -i totalFitxers
+	local -i filtreInode
+	local -i filtrePerm
+	local -i filtreNom
+
+	totalFitxers=0
+	cd $1 2> $sortidaError # Accedeix al contingut del directori
+
+	llistaDir=`llistar $1` # Llista el contingut del directori
+
+	for i in $llistaDir # I va tractant tots els seus fitxers un a un
+	do
+		infoDirActual=`(ls -lisa "$i" | tr -s ' ') 2> $sortidaError` # Obte la informacio del fitxer $i
+
+		if [ -f "$i" ] && [ ! -L "$i" ]; then # Si es un fitxer ordinari
+			# recupera la informacio del fitxer $i, com l'inode, els permisos i els links
+			inode=`echo "$infoDirActual" | awk '{ print $1 }'`
+			mida=`echo "$infoDirActual" | awk '{ print $7 }'`
+			perm=`echo "$infoDirActual" | awk '{ print $3 }'`
+			nlinks=`echo "$infoDirActual" | awk '{ print $4 }'`
+			filtreInode=0
+			filtrePerm=0
+			filtreNom=0
+
+			if [[ $filtre = 1 ]]; then # Si han entrat algun filtre en executar l'script
+				# Filtra per l'inode del fitxer
+				if [[ $numInode != "" ]]; then
+					if [[ `echo "$inode" | grep "$numInode" | wc -m` > 0 ]]; then
+						filtreInode=1
+					fi
+				else
+					filtreInode=1
+				fi
+
+				# Filtra pels permisos del fitxer
+				if [[ $permisos != "" ]]; then
+					if [[ `echo "$perm" | grep -- "$permisos" | wc -m` > 0 ]]; then
+						filtrePerm=1
+					fi
+				else
+					filtrePerm=1
+				fi
+
+				# Filtra pel nom del fitxer
+				if [[ $nomFitxer != "" ]]; then
+					if [[ `echo "$i" | grep "$nomFitxer" | wc -m` > 0 ]]; then
+						filtreNom=1
+					fi
+				else
+					filtreNom=1
+				fi
+
+				# I si passa els filtres, mostra el nom del fitxer
+				if [[ $filtreInode > 0 ]] && [[ $filtrePerm > 0 ]] && [[ $filtreNom > 0 ]]; then				
+					imprimir "$infoDirActual"
+					let totalFitxers=totalFitxers+1
+				fi
+			else # Si no han entrat cap filtre, mostra el nom del fitxer directament
+				imprimir "$infoDirActual"
+				let totalFitxers=totalFitxers+1
+			fi
+		elif [ -d "$i" ] && [[ $i != "." ]] && [[ $i != ".." ]]; then # Si $i es un directori, accedeix al seu contingut
+			buscar "$1/$i"
+		fi
+	done
+
+	if [[ $totalFitxers > 0 ]]; then # Mostra la ruta on a trobat els fitxers
+		imprimir "Trobat a ${1}. S'han trobat $totalFitxers fitxers"
+		numFitxers=$(( $numFitxers + $totalFitxers ))
+	fi
+	cd .. # I finalment, torna enrere
+}
+
+# Tercera part, crida a la funcio principal
+
+buscar $directori
+
+echo ""
+echo "Total de fitxers trobats: $numFitxers fitxers"

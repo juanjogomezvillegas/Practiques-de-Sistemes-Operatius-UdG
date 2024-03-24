@@ -1,0 +1,28 @@
+setfacl -m <u|g|o>:<usuari|grup|altres>:<rwXx> <fitxer>
+setfacl -x <usuari|grup|altres> <fitxer>
+getfacl <fitxer>
+getopts
+ls -li | tr -s ' ' | cut -d " " -f 9
+ls -li | tr -s ' ' | awk '{ print $1 }'
+./busca > out 2>&1
+ls --size=sort # ordena fitxers per mida
+ls -lsh # mostra la mida dels fitxers d'una manera llegible pels humans
+truncate -s 5k aaa # Simula que crea un fitxer aaa de mida 5KB
+tar -cvzf $dir/backupHOME.tgz /home # Crea un tar.gz en aquest cas amb el contingut de home
+tar -xvf $dir/backupHOME.tgz # extreure el contingut d'un tar.gz
+ln path nom_link # crea el hardlink nom_link
+ln -s path nom_link # crea el softlink nom_link
+ps -o pid,user,%mem,command -ax | sort -n -r -k 3 | head -n 10
+find <valor> -type f | wc -l
+du -h <directori> # mostra un resum de mida dels fitxers
+du -s -h <directori> # mostra la mida en general del directori
+
+
+
+
+
+# directori, link 2 (el . i el nom, més els .. dels subdirectoris)
+# fitxer ordinari, link 1
+# softlink tipus de fitxer, link 1 (a les dades guarda una ruta)
+# hardlink ruta, link del desti 2
+# https://www.google.com/search?client=firefox-b-d&q=como+canviar+el+color+de+la+salida+estandard+de+unix

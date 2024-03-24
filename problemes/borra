@@ -1,0 +1,28 @@
+#!/bin/bash
+
+#set -x
+
+function esborra() {
+	for i in `ls`
+	do
+		if [ -f $i ]; then
+			if [ $i == $1 ]; then
+				rm $i
+			fi
+		elif [ -d $i ]; then
+			cd $i
+			esborra $1
+			cd ..
+		fi
+	done
+}
+
+if [ $# -ne 2 ]; then
+	echo "Falten parametres. Ajuda: borra <directori> <fitxer>" 1>&2
+else
+	if [ -d $1 ]; then
+		esborra $2
+	else
+		echo "$1 no es un directori" 1>&2
+	fi
+fi

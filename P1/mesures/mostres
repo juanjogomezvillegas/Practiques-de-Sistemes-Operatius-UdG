@@ -1,0 +1,46 @@
+#!/bin/bash
+# Programa realitzat per Juan Jose Gomez Villegas
+
+# set -x
+
+fcopiats=0
+
+if [ $# = 0 ]; then # Si no s'ha entrat cap parametre
+	for i in $( ls ) # Va iterant per cada fitxer i directori del directori actual
+	do
+		if [ -d $i ]; then # I va comprovant si $i es un directori
+			for j in $( ls $i | cut -c -1 ) # I si es un directori, copia tots els seus fitxers i incrementa el nombre de fitxers copiats
+			do
+				cp ./$i/$j.out ./${j}_${i}.out
+				fcopiats=$((fcopiats + 1))
+			done
+		fi
+	done
+else # Si s'ha entrat almenys un parametre
+	errors=0
+	for i in $@ # Abans de tot, valida els parametres un a un, fent servir una expressio regular
+	do
+		if [ `echo $i | grep '^[a-z]\{1\}$' | wc -m` -eq 0 ]; then
+			errors=$((errors + 1))
+		fi
+	done
+
+	if [ $errors -gt 0 ]; then # I si troba algun error, mostra un missatge
+		echo "Error: Els parametres no son correctes." 1>&2
+		exit
+	else # Si els parametres son correctes
+		for i in $@
+		do
+			for j in $( ls ) # Per cada paramatre, va iterant per cada fitxer i directori del directori actual
+			do
+				# I va comprovant si $j es un directori, i es queda només amb els fitxers que coincideixin amb $i. Si hi ha algun, el copia i incrementa el nombre de fitxers copiats
+				if [ -d $j ] && [ `ls $j | grep $i.out | wc -l` -gt 0 ]; then
+					cp ./$j/$i.out ./${i}_${j}.out
+					fcopiats=$((fcopiats + 1))
+				fi
+			done
+		done
+	fi
+fi
+
+echo "S'han copiat $fcopiats fitxers de mostres." # Finalment, mostra el nombre de fitxers copiats

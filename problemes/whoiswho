@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if test $# -eq 0
+then
+	echo "error falten parametres"
+	exit
+else
+	while [ "$1" ]
+	do
+		grep $1 /etc/passwd | cut -f 5 -d ':'
+		shift
+	done
+fi
