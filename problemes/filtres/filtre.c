@@ -3,12 +3,17 @@
 int i;
 char buff[80];
 
-main()
+main(int argc, char *argv[])
 {
-	i=read(0,buff, 80);
-	while(i>0)
-	{
-		write(1,buff, i);
-		i=read(0,buff,80);
+	if (argc == 2) {
+		printf(argv[1]);
+		i=read(0,buff, 80);
+		while(i>0)
+		{
+			write(1,buff, i);
+			i=read(0,buff,80);
+		}
+	} else {
+		printf("error amb els parametres");
 	}
 }
