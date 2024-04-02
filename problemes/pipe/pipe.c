@@ -5,7 +5,7 @@
 int pid, estat, fd[2];
 
 /**
-	comanda ls -lisa | sort
+	comanda ls -lisa | grep a
 	gcc -o pipe pipe.c
 **/
 main() {
