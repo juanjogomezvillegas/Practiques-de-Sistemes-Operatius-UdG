@@ -17,7 +17,7 @@ main() {
 		close(fd[0]);
 		close(fd[1]);
 		execl("/bin/grep", "grep", "a", (char *)0);
-		exit(1); // el fill no va bé
+		exit(0);
 	} else { // es el pare
 		close(1);
 		dup(fd[1]);
