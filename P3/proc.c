@@ -28,6 +28,7 @@ int main(int argc, char *argv[]) {
 		if ((pid1 = fork()) == 0) {
 			estat2 = pipe(fd2);
 			if ((pid2 = fork()) == 0) { // codi del sort
+				printf("UNIX is not LINUX");
 				close(0);
 				dup(fd2[0]);
 				close(fd2[0]);
@@ -36,13 +37,13 @@ int main(int argc, char *argv[]) {
 				exit(0);
 			} else { // codi del grep
 				close(0);
+				close(1);
 				dup(fd1[0]);
+				dup(fd2[1]);
 				close(fd1[0]);
 				close(fd1[1]);
-				close(1);
-				dup(fd2[1]);
 				close(fd2[0]);
-				close(fd2[1]);				
+				close(fd2[1]);
 				execl("/bin/grep", "grep", "Vm", (char *)0);
 				exit(0);
 			}
@@ -54,7 +55,7 @@ int main(int argc, char *argv[]) {
 			execl("/bin/cat", "cat", ruta, (char *)0);
 			exit(0);
 		}
-		
+				
 		/*estat = pipe(fd);
 		pid = fork();
 		if (pid == 0) { // es el fill
