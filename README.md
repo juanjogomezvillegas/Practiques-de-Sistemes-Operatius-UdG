@@ -23,9 +23,9 @@ Els paràmetres d'aquest script són opcionals, si no es passa cap paràmetre mo
 $ ./busca
 ```
 
-I pot canviar de directori, i ordenar els fitxers per mida (per defecte s'ordenen de forma alfanùmerica).
+I es pot canviar de directori, i ordenar els fitxers per mida (per defecte s'ordenen de forma alfanùmerica). També es pot redirigir la sortida estàndard cap a un fitxer.
 
-També pot redirigir la sortida estàndard cap a un fitxer.
+*Nota: A UNIX, ~ es refereix al valor de la variable $HOME*
 
 ```sh
 $ ./busca -d ~ -o mida -s sortida.txt
@@ -43,7 +43,7 @@ Per executar l'script cal fer.
 
 ```sh
 $ gcc -o proc proc.c
-$ ps -ef | grep <nom d'usuari de unix>
+$ ps -ef | grep <nom de usuari de unix>
 ```
 *El grep es per cercar els processos als que es tinguin permisos*
 
