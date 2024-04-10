@@ -13,7 +13,7 @@ i una possible execució que cerca i copia tots els fitxers que es diguin *a*, *
 $ ./mostres a b c
 ```
 
-{Per defecte si no se li passa cap paràmetre cerca i copia tots els fitxers}[style="color: blue"]
+*Per defecte si no se li passa cap paràmetre cerca i copia tots els fitxers*
 
 ## P2: Programa amb shell que imita a la comanda find de unix
 
@@ -45,7 +45,7 @@ Per executar l'script cal fer.
 $ gcc -o proc proc.c
 $ ps -ef | grep <nom d'usuari de unix>
 ```
-{El grep es per cercar els processos als que es tinguin permisos}[style="color: blue"]
+*El grep es per cercar els processos als que es tinguin permisos*
 
 I un cop obtingut el pid del procés ja es pot fer.
 
