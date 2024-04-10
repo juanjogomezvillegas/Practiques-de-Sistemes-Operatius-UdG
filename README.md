@@ -5,7 +5,7 @@
 Per executar-ho, abans cal fer.
 
 ```sh
-$ cd P1; tar -xvf mesures; cd mesures
+$ tar -xvf mesures; cd mesures
 ```
 i una possible execució que cerca i copia tots els fitxers que es diguin *a*, *b* o *c*.
 
