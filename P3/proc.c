@@ -48,6 +48,12 @@ int main(int argc, char *argv[]) {
 		strcat(ruta, argv[1]);
 		strcat(ruta, "/status");
 
+		// Comprova que el PID existeix, i la comanda cat no donara cap error
+		if (!fopen(ruta, "r")) {
+			printf("\033[0;41mError el PID %s no existeix o no hi tens p. Per buscar un altre executa: ps -ef | grep %s \033[0m \n", argv[1], codiUdg);
+			exit(1);
+		}
+
 		// I segon, executa la comanda
 		// Crea dues pipes
 		estat1 = pipe(fd1);
@@ -88,8 +94,8 @@ int main(int argc, char *argv[]) {
 		// Executa el cat fent un execl, que esborra la memòria i canvia el codi pel codi de /bin/cat
 		execl("/bin/cat", "cat", ruta, (char *)0);
 		exit(0);
-	} else {
-		printf("\033[0;41mError amb els parametres. Ajuda:\n%s <pid del procés> \033[0m \n", argv[0]);
+	} else { // En cas d'error amb els paràmetres, mostra una ajuda de com executar el programa
+		printf("\033[0;41mError amb els parametres.\nAjuda:   %s <pid del procés> \033[0m \n", argv[0]);
 		exit(1);
 	}
 }
