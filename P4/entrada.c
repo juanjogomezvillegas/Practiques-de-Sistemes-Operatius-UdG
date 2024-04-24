@@ -8,10 +8,17 @@
 #include <string.h>
 #include <fcntl.h>
 
+int i;
+char buff[30];
+
 /**
 * Pre:
 * Post:
 **/
 int main(int argc, char *argv[]) {
-	printf("Sóc l'entrada");
+	i = read(0, buff, 30);
+	while (i > 0) {
+		write(1, buff, 30);
+		i = read(0, buff, 30);
+	}
 }
