@@ -14,11 +14,14 @@ char buff[30];
 /**
 * Pre:
 * Post:
-**/
+*/
 int main(int argc, char *argv[]) {
 	i = read(0, buff, 30);
 	while (i > 0) {
 		write(1, buff, 30);
+		if (strcmp("XX", buff) == 0) {
+                        printf("Si");
+                }
 		i = read(0, buff, 30);
 	}
 }
