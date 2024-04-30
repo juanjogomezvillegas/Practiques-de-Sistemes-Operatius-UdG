@@ -30,11 +30,11 @@ int main(int argc, char *argv[]) {
 	//i = read(0, buff, 30);
 	scanf("%s", buff);
 	while (!(strIsEqual(buff, FI))) {
-		//write(1, buff, 30);
+		write(1, buff, 30);
 
 		//strcpy(buff, "");
 
-		printf("\n%s\n", buff);
+		//printf("\n%s\n", buff);
 
 		//i = read(0, buff, 30);
 		scanf("%s", buff);
