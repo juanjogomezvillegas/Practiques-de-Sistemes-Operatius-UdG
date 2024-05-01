@@ -10,33 +10,33 @@
 #include <stdbool.h>
 
 // Variables
-int i;
+int canal, i;
 char buff[30];
-char* FI = "XX";
+char FI[] = "XX";
 
 /**
 * Pre: s1 i s2 no són buits
-* Post: retorna si s1 i s2 són iguals o no
+* Post: retorna si s1 i s2 són iguals
 */
-bool strIsEqual(char* s1, char* s2) {
+bool strIsEqual(char s1[], char s2[]) {
 	return strcmp(s1, s2) == 0;
 }
 
 /**
 * Pre: Cert
-* Post: Va llegint paraules fins a entrar la cadena XX
+* Post: Va llegint paraules del teclat fins a entrar la cadena XX
 */
 int main(int argc, char *argv[]) {
-	//i = read(0, buff, 30);
-	scanf("%s", buff);
-	while (!(strIsEqual(buff, FI))) {
-		write(1, buff, 30);
-
-		//strcpy(buff, "");
-
-		//printf("\n%s\n", buff);
-
-		//i = read(0, buff, 30);
-		scanf("%s", buff);
+	canal = open("./canal", O_WRONLY);
+	if (canal < 0) {
+		perror("Error al obrir la pipe amb nom");
+		exit(1);
 	}
+	
+	do {
+		i = read(0, buff, 30);
+		write(canal, buff, i);
+	} while (!(strIsEqual(buff, FI)));
+	
+	close(canal);
 }
