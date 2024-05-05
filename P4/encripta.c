@@ -8,6 +8,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <stdbool.h>
+#include <signal.h>
 
 // Variables
 int canal, i; // canal = pipe amb nom; i = caràcters llegits
@@ -38,6 +39,45 @@ int crearNamedPipe(char* nom, mode_t mode) {
 }
 
 /**
+* Pre: Cert
+* Post: Reorganitza els canals dels processos fills de l'encripta, per tal que només puguin llegir de la pipe interna
+**/
+void reorganitzarCanals() {
+	close(0);
+	dup(fd[0]);
+	close(fd[0]);
+	close(fd[1]);
+	close(canal); // I que tampoc puguin llegir de la pipe amb nom
+}
+
+/**
+* Pre: Cert
+* Post:
+**/
+void canviVocals() {
+	printf("proces 1");
+	pause();
+}
+
+/**
+* Pre: Cert
+* Post:
+**/
+void cadenaDelReves() {
+	printf("proces 2");
+	pause();
+}
+
+/**
+* Pre: Cert
+* Post:
+**/
+void duplicarLletres() {
+	printf("proces 3");
+	pause();
+}
+
+/**
 * Pre:
 * Post:
 **/
@@ -48,9 +88,8 @@ int main(int argc, char* argv[]) {
 	
 	pid1 = fork(); // Crea el procés de canvi de vocals
 	if (pid1 == 0) {
-		wait(2);
-		printf("Soc el 1");
-		wait(2);
+		reorganitzarCanals();
+		pause();
 	} else if (pid1 < 0) {
 		perror("Error al crear el procés de canvi de vocals");
 		exit(1);
@@ -58,9 +97,8 @@ int main(int argc, char* argv[]) {
 	
 	pid2 = fork(); // Crea el procés de cadena del revés
 	if (pid2 == 0) {
-		wait(2);
-		printf("Soc el 2");
-		wait(2);
+		reorganitzarCanals();
+		pause();
 	} else if (pid1 < 0) {
 		perror("Error al crear el procés de cadena del revés");
 		exit(1);
@@ -68,25 +106,33 @@ int main(int argc, char* argv[]) {
 	
 	pid3 = fork(); // Crea el procés de duplica lletres
 	if (pid3 == 0) {
-		wait(2);
-		printf("Soc el 3");
-		wait(2);
+		reorganitzarCanals();
+		pause();
 	} else if (pid1 < 0) {
 		perror("Error al crear el procés de duplica lletres");
 		exit(1);
 	}
+	// Reorganitzar els canals del pare, per tal que només pugui escriure a la pipe interna
+	close(fd[0]);
+	dup(fd[1]);
+	close(fd[1]);
 	
 	i = read(canal, buff, 30); // Rep la primera paraula
 	while (i > 0) {
 		// Tractar paraula
-		write(1, buff, i);
+		write(fd[0], buff, i);
+		
+		// Despertar a un dels fills
+		signal(SIGUSR1, pid1);
+		kill(pid1, SIGUSR1);
+		
 		i = read(canal, buff, 30); // Rep la següent paraula
 	}
 
-	// Mata als processos fills
-	kill(pid1, 9);
-	kill(pid2, 9);
-	kill(pid3, 9);
+	// Indica als processos fills que s'ha acabat
+	kill(pid1, SIGTERM);
+	kill(pid2, SIGTERM);
+	kill(pid3, SIGTERM);
 	close(estat); // Tanca la pipe interna
 	close(canal); // Tanca el canal de lectura a la pipe amb nom
 }
