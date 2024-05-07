@@ -61,4 +61,40 @@ $ cat /proc/<PID del procés>/status | grep Vm | sort -nrk2 >> sortida.txt
 
 ## P4: Programa amb C
 
+Per executar l'script cal fer.
+
+```sh
+$ gcc -o entrada entrada.c
+$ gcc -o encripta encripta.c
+```
+
+I és pot executar amb dos terminals fent:
+
+Terminal 1:
+
+```sh
+$ ./encripta
+```
+
+Terminal 2:
+
+```sh
+$ ./entrada
+```
+
+O en un sol terminal fent:
+
+```sh
+$ ./encripta &
+$ ./entrada
+```
+*& vol dir que s'executa en segon pla*
+
 ## P5: Programa amb Powershell
+
+Exactament igual que la pràctica 1, però amb Powershell.
+
+```powershell
+> cd mesures
+> mostres.ps1 a b c
+```
