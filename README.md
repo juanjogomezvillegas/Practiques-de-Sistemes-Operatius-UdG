@@ -96,5 +96,5 @@ Exactament igual que la pràctica 1, però amb Powershell.
 
 ```powershell
 > cd mesures
-> mostres.ps1 a b c
+> ./mostres.ps1 a b c
 ```
