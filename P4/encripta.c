@@ -55,17 +55,32 @@ void reorganitzarCanals() {
 * Post:
 **/
 void canviVocals() {
-	printf("proces 1");
-	pause();
+	char* paraula;
+	int j = read(0, paraula, 30);
+	
+	if (j > 0) {
+		write(1, paraula, j);
+	}
 }
 
 /**
 * Pre: Cert
-* Post:
+* Post: A partir d'una paraula rebuda per la pipe interna, la mostra per pantalla del revés
 **/
 void cadenaDelReves() {
-	printf("proces 2");
-	pause();
+	char* paraula;
+	int j = read(0, paraula, 30); // Rep la paraula de la pipe interna
+	
+	if (j > 0) { // I si la rebut correctament, llavors
+		int y = 0; // Declara un comptador per llegir la paraula
+		char reves[i]; // I on es guardara la paraula del revés
+		for (int x = j - 1; x >= 0; x--) {
+			reves[x] = paraula[y]; // I la va invertint caràcter a caràcter
+			y++;
+		}
+		
+		write(1, reves, j); // I finalment, escriu la paraula del revés per pantalla
+	}
 }
 
 /**
@@ -73,8 +88,12 @@ void cadenaDelReves() {
 * Post:
 **/
 void duplicarLletres() {
-	printf("proces 3");
-	pause();
+	char* paraula;
+	int j = read(0, paraula, 30);
+	
+	if (j > 0) {
+		write(1, paraula, j);	
+	}
 }
 
 /**
@@ -89,6 +108,7 @@ int main(int argc, char* argv[]) {
 	pid1 = fork(); // Crea el procés de canvi de vocals
 	if (pid1 == 0) {
 		reorganitzarCanals();
+		signal(SIGUSR1, canviVocals);
 		pause();
 	} else if (pid1 < 0) {
 		perror("Error al crear el procés de canvi de vocals");
@@ -98,8 +118,9 @@ int main(int argc, char* argv[]) {
 	pid2 = fork(); // Crea el procés de cadena del revés
 	if (pid2 == 0) {
 		reorganitzarCanals();
+		signal(SIGUSR1, cadenaDelReves);
 		pause();
-	} else if (pid1 < 0) {
+	} else if (pid2 < 0) {
 		perror("Error al crear el procés de cadena del revés");
 		exit(1);
 	}
@@ -107,8 +128,9 @@ int main(int argc, char* argv[]) {
 	pid3 = fork(); // Crea el procés de duplica lletres
 	if (pid3 == 0) {
 		reorganitzarCanals();
+		signal(SIGUSR1, duplicarLletres);
 		pause();
-	} else if (pid1 < 0) {
+	} else if (pid3 < 0) {
 		perror("Error al crear el procés de duplica lletres");
 		exit(1);
 	}
@@ -123,8 +145,7 @@ int main(int argc, char* argv[]) {
 		write(fd[0], buff, i);
 		
 		// Despertar a un dels fills
-		signal(SIGUSR1, pid1);
-		kill(pid1, SIGUSR1);
+		//kill(pid2, SIGUSR1);
 		
 		i = read(canal, buff, 30); // Rep la següent paraula
 	}
@@ -135,6 +156,7 @@ int main(int argc, char* argv[]) {
 	kill(pid3, SIGTERM);
 	close(estat); // Tanca la pipe interna
 	close(canal); // Tanca el canal de lectura a la pipe amb nom
+	unlink("./canal"); // I esborra la pipe amb nom
 }
 
 // crear tres processos dormint
