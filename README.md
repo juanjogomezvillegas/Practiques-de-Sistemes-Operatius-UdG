@@ -59,7 +59,7 @@ L'script imita l'execució de la comanda.
 $ cat /proc/<PID del procés>/status | grep Vm | sort -nrk2 >> sortida.txt
 ```
 
-## P4: Programa amb C
+## P4: Programa amb C en que un procés escriu paraules a una namedPipe i l'altre les llegeix
 
 Per executar l'script cal fer.
 
@@ -90,7 +90,7 @@ $ ./entrada
 ```
 *& vol dir que s'executa en segon pla*
 
-## P5: Programa amb Powershell
+## P5: Programa amb Powershell que copia fitxers
 
 Exactament igual que la pràctica 1, però amb Powershell.
 
