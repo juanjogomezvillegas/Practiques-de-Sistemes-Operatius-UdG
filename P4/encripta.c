@@ -18,6 +18,14 @@ int torn = 1;
 char buff[30]; // paraula rebuda
 
 /**
+* Pre: s1 i s2 no són buits
+* Post: retorna si s1 i s2 són iguals
+*/
+bool strIsEqual(char s1[], char s2[]) {
+	return strcmp(s1, s2) == 0;
+}
+
+/**
 * Pre: nom i mode no són buits
 * Post: Crea una pipe amb el nom indicat i l'obre també amb el mode indicat (lectura o escriptura)
 **/
@@ -61,17 +69,35 @@ void sortir() {
 
 /**
 * Pre: Cert
-* Post: A partir d'una paraula rebuda per la pipe interna, la mostra per pantalla
+* Post: A partir d'una paraula rebuda per la pipe interna, la mostra per pantalla canviant les vocals per numeros
 **/
 void canviVocals() {
-	char lletres[5] = {'a','e','i','o','u'};
-	char numeros[5] = {'4','3','1','0','1'};
+	int nVocals = 5;
+	char lletres[] = {'a','e','i','o','u'};
+	char numeros[] = {'4','3','1','0','1'};
 	
 	char paraula[30];
-	int j = read(fd[0], paraula, 30);
+	int j = read(fd[0], paraula, 30); // Rep la paraula de la pipe interna
+	
+	if (j > 0) { // I si la rebut correctament, llavors
+		char encriptada[j]; // Crea la cadena de caràcters on es guardara la paraula amb les vocals canviades per numeros
 		
-	if (j > 0) {
-		write(1, paraula, j);
+		int y = 0;
+		for (int x = 0; x < j; x++) { // I va iterant la paraula, i per cada caràcter
+			while (y < nVocals && paraula[x] != lletres[y]) { // Comprova si es una vocal
+				y++;
+			}
+			
+			if (y < nVocals) { // Si es una vocal, fa el canvi
+				encriptada[x] = numeros[y];
+			} else { // Si no, no farà cap canvi
+				encriptada[x] = paraula[x];
+			}
+			
+			y = 0;
+		}
+	
+		write(1, encriptada, j); // I finalment, escriu la paraula canviant les vocals per numeros
 	}
 }
 
@@ -84,36 +110,40 @@ void cadenaDelReves() {
 	int j = read(fd[0], paraula, 30); // Rep la paraula de la pipe interna
 	
 	if (j > 0) { // I si la rebut correctament, llavors
+		char reves[j+1]; // Crea la cadena de caràcters on es guardara la paraula del revés
+		
 		int y = 0; // Declara un comptador per llegir la paraula
-		char reves[j]; // I on es guardara la paraula del revés
 		for (int x = j - 1; x >= 0; x--) {
 			reves[x] = paraula[y]; // I la va invertint caràcter a caràcter
 			y++;
 		}
 		
-		write(1, reves, j); // I finalment, escriu la paraula del revés per pantalla
+		reves[j] = '\n';
+		
+		write(1, reves, j+1); // I finalment, escriu la paraula del revés per pantalla
 	}
 }
 
 /**
 * Pre: Cert
-* Post: A partir d'una paraula rebuda per la pipe interna, la mostra per pantalla
+* Post: A partir d'una paraula rebuda per la pipe interna, la mostra per pantalla amb les lletres duplicades
 **/
 void duplicarLletres() {
 	char paraula[30];
-	int j = read(fd[0], paraula, 30);
+	int j = read(fd[0], paraula, 30); // Rep la paraula de la pipe interna
 	
-	if (j > 0) {
-		/*char duplicada[j * 2];
+	if (j > 0) { // I si la rebut correctament, llavors
+		char duplicada[j * 2]; // Crea una paraula que dupliqui la mida de la paraula llegida
 		
-		int y = 0;
-		for (int x = 0; x < (j * 2); x += 2) {
-			duplicada[x] = paraula[y];
-			duplicada[x + 1] = paraula[y];
-			y++;
-		}*/
-		
-		write(1, paraula, j);
+		int y = 0; // Crea un comptador que anirà sempre de 2 en 2
+		for (int x = 0; x < j; x++) {
+			// I va iterant la paraula llegida, assignant cada caràcter a les dues posicions contigues de la paraula duplicada
+			duplicada[y] = paraula[x];
+			duplicada[y + 1] = paraula[x];
+			y += 2;
+		}
+				
+		write(1, duplicada, j * 2); // I finalment, escriu la paraula amb les lletres duplicades
 	}
 }
 
@@ -192,7 +222,7 @@ int main(int argc, char* argv[]) {
 		write(fd[1], buff, i); // Envia la paraula a través de la pipe interna
 		
 		seleccionarProces(); // I desperta a un dels processos fills
-		
+				
 		i = read(canal, buff, 30); // I rep la següent paraula
 	}
 

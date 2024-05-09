@@ -1,5 +1,7 @@
 ﻿# Programa realitzat per Juan Jose Gomez Villegas (u1987338)
 
+cd mesures
+
 # Pre: $r és la ruta on són els directoris
 # Post: Retorna un array de noms de directoris
 Function Directoris ($r) {
