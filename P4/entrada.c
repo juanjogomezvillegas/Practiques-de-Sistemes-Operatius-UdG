@@ -9,13 +9,16 @@
 #include <fcntl.h>
 #include <stdbool.h>
 
+// Constants
+const int MIDA_BUFF = 30;
+
 // Variables
-int canal, i;
-char buff[30];
-char FI[] = "XX\n";
+int canal, i; // canal, és la pipe amb nom; i, és el nombre de caràcters llegits
+char buff[30]; // buffer on es guardarà la paraula llegida
+char FI[] = "XX\n"; // marca de fi
 
 /**
-* Pre: s1 i s2 no són buits
+* Pre: s1 i s2 no són buits i són cadenes de caràcter
 * Post: retorna si s1 i s2 són iguals
 */
 bool strIsEqual(char s1[], char s2[]) {
@@ -33,15 +36,15 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}
 	
-	// I si tot va bé, es posa a llegir paraules del teclat mentre la cadena entrada no sigui XX (la cadena XX no s'enviarà a través de la pipe amb nom)
+	// I si tot va bé, es posa a llegir paraules del teclat mentre la cadena entrada no sigui XX (la cadena XX no s'enviarà)
 	
 	printf("Entra paraules a encriptar (Per acabar entra \"XX\"):\n");
 	
-	i = read(0, buff, 30); // Llegeix la primera paraula
+	i = read(0, buff, MIDA_BUFF); // Llegeix la primera paraula
 	while (!(strIsEqual(buff, FI))) { // Mentre sigui diferent de XX
 		write(canal, buff, i); // Envia la paraula a la pipe amb nom
 		
-		i = read(0, buff, 30); // I llegeix la següent paraula
+		i = read(0, buff, MIDA_BUFF); // I llegeix la següent paraula
 		
 		buff[i] = '\0'; // I abans de continuar, insereix una marca de fi de cadena a la paraula llegida per poder-la comparar
 	}
