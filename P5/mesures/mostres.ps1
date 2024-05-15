@@ -1,12 +1,12 @@
-﻿# Programa realitzat per Juan Jose Gomez Villegas (u1987338)
+﻿# Programa realitzat per Juan José Gómez Villegas (u1987338)
 
 # Pre: cert
-# Post: Retorna la ruta des d'on executar l'script
+# Post: retorna la ruta des d'on executar l'script
 Function entrarMesures () {
-    if ((Get-ChildItem -Path . | Where-Object -Property Name -EQ mesures).Length -eq 0) { # Si no troba cap directori mesures, l'script s'executarà des del directori actual
-        # En aquest cas, se suposa que l'script mostres estarà a dins del directori mesures (com a la pràctica 1)
+    if ((Get-ChildItem -Path . | Where-Object -Property Name -EQ mesures).Length -eq 0) { # si no troba cap directori mesures, retorna el directori actual . com a ruta
+        # en aquest cas, se suposa que l'script mostres estarà a dins del directori mesures (com a la pràctica 1)
 		$ruta = "."
-    } else { # Si troba un directori mesures, l'script s'executarà amb la ruta mesures/
+    } else { # si troba un directori mesures, retorna el directori mesures com a ruta
         $ruta = "mesures"
     }
 
@@ -14,68 +14,68 @@ Function entrarMesures () {
 }
 
 # Pre: $r és la ruta on són els directoris
-# Post: Retorna un array de noms de directoris
+# Post: retorna un array de noms de directoris
 Function Directoris ($r) {
-	if (Test-Path $r) {
+	if (Test-Path $r) { # si $r existeix, retorna només els directoris
 		Get-ChildItem -Path $r | Where-Object -Property Mode -EQ "d-----" | Select-Object -Property Name
-	} else {
+	} else { # si no, acaba
 		exit
 	}
 }
 
 # Pre: $d és el directori on són els fitxers
-# Post: Retorna un array de noms de fitxers
+# Post: retorna un array de noms de fitxers
 Function Fitxers ($d) {
-    if (Test-Path $d) {
+    if (Test-Path $d) { # si $d existeix, retorna només els fitxers
 		Get-ChildItem -Path $d | Where-Object -Property Mode -EQ "-a----" | Select-Object -Property Name
-	} else {
+	} else { # si no, acaba
 		exit
 	}
 }
 
-$ruta = entrarMesures
+$ruta = entrarMesures # estableix la ruta des d'on copiar els fitxers
 
 $fcopiats = 0
 $errors = 0
-$directoris = Directoris($ruta) # obté els directoris de la carpeta mostres
+$directoris = Directoris($ruta) # obté els directoris que hi ha a $ruta
 
-if ($args.Length -eq 0) { # Si no s'ha entrat cap parametre
-    foreach ($i in $directoris) { # Va iterant per cada directori
-        $fitxers = Fitxers($ruta + "/" + $i.Name) # Obté tots els fitxers de $i
+if ($args.Length -eq 0) { # si no s'ha entrat cap paràmetre
+    foreach ($i in $directoris) { # va iterant per cada directori
+        $fitxers = Fitxers($ruta + "/" + $i.Name) # obté tots els fitxers de $i
 
-        foreach ($j in $fitxers) { # Va iterant per cada fitxer de $i, i fent una copia de $j amb el nom de $i
+        foreach ($j in $fitxers) { # i va iterant per cada fitxer de $i, fent una còpia de $j amb el nom de $i afegit
 			$origen = $ruta + "/" + $i.Name + "/" + $j.Name
             $desti = $j.Name.Substring(0, 1) + "_" + $i.Name + ".out"
             
-            cp $origen $desti
+            cp $origen $desti # còpia el fitxer $j
 
-            $fcopiats = $fcopiats + 1 # I incrementa el nombre de fitxers copiats
+            $fcopiats = $fcopiats + 1 # i incrementa el nombre de fitxers copiats
         }
     }
-} else { # Si s'ha entrat almenys un parametre
-    foreach ($i in $args) { # Abans de tot, valida els parametres un a un, fent servir una expressio regular
-        if (!($i -match '^[a-z]$')) {
+} else { # si s'ha entrat almenys un paràmetre
+    foreach ($i in $args) { # abans de tot, valida els paràmetres un a un, fent servir una expressió regular
+        if (!($i -match '^[a-z]$')) { # expressió regular: són vàlids els paràmetres que siguin un sol caràcter d'inici a fi, en aquesta pràctica no comprova si està en minúscula, ja que existeix la funció lowercase()
             $errors = $errors + 1;
         }
     }
 
-    if ($errors -gt 0) { # I si troba algun error, mostra un missatge
+    if ($errors -gt 0) { # si troba algun error, mostra un missatge i acaba
         Write-Output "Error: Els parametres no son correctes"
         exit
-    } else { # Si els parametres son correctes
-        foreach ($a in $args) { # Per cada paramatre
-            foreach ($i in $directoris) { # Va iterant per cada directori
-                $fitxers = Fitxers($ruta + "/" + $i.Name) # Obté tots els fitxers de $i
+    } else { # Si els paràmetres són correctes
+        foreach ($a in $args) { # va iterant per cada paràmatre
+            foreach ($i in $directoris) { # i va iterant per cada directori
+                $fitxers = Fitxers($ruta + "/" + $i.Name) # obté tots els fitxers de $i
 
-                foreach ($j in $fitxers) { # Va iterant per cada fitxer de $i, i comprovant que $j es igual a $a (en minuscula)
+                foreach ($j in $fitxers) { # i va iterant per cada fitxer de $i, i comprovant que $j és igual a $a (en minúscula)
                     if ($a.ToLower() -eq $j.Name.Substring(0, 1)) {
-						# Si coincideixen, copia $j amb el nom de $i
+						# si coincideixen, còpia $j amb el nom de $i afegit
                         $origen = $ruta + "/" + $i.Name + "/" + $j.Name
                         $desti = $j.Name.Substring(0, 1) + "_" + $i.Name + ".out"
-            
-                        cp $origen $desti
 
-                        $fcopiats = $fcopiats + 1 # I incrementa el nombre de fitxers copiats
+                        cp $origen $desti # còpia el fitxer $j
+
+                        $fcopiats = $fcopiats + 1 # i incrementa el nombre de fitxers copiats
                     }
                 }
             }
@@ -83,4 +83,4 @@ if ($args.Length -eq 0) { # Si no s'ha entrat cap parametre
     }
 }
 
-Write-Output "S'han copiat $fcopiats fitxers de mostres." # Finalment, mostra el nombre de fitxers copiats
+Write-Output "S'han copiat $fcopiats fitxers de mostres." # finalment, mostra el nombre de fitxers copiats
